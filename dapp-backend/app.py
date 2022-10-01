@@ -6,7 +6,8 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 from create_db import User, db, app
-
+from flask_cors import CORS
+CORS(app)
 
 def token_required(f):
 	@wraps(f)
@@ -49,8 +50,7 @@ def get_all_users(current_user):
 
 @app.route('/login', methods =['POST'])
 def login():
-	auth = request.form
-
+	auth =  request.json
 	if not auth or not auth.get('email') or not auth.get('password'):
 		return make_response(
 			'Could not verify',
