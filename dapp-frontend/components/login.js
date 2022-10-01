@@ -2,10 +2,9 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-
-// import { Link } from 'components';
+import axios from "axios";
 import { Layout } from './account/Layout';
-// import { userService, alertService } from 'services';
+
 
 export default Login;
 
@@ -19,20 +18,50 @@ function Login() {
     });
     const formOptions = { resolver: yupResolver(validationSchema) };
 
-    // get functions to build form with useForm() hook
     const { register, handleSubmit, formState } = useForm(formOptions);
     const { errors } = formState;
 
     function onSubmit({ username, password }) {
         // return userService.login(username, password)
-        //     .then(() => {
-        //         // get return url from query parameters or default to '/'
-        //         const returnUrl = router.query.returnUrl || '/';
-        //         router.push(returnUrl);
-        //     })
-        //     .catch(alertService.error);
+        // .then(() => {
+        //     // const returnUrl = router.query.returnUrl || '/';
+        //     // router.push(returnUrl);
+        //     console.log("Sucessful")
+        // })
+        // .catch(alertService.error);
+        axios({
+            method: "POST",
+            url:"http://127.0.0.1:5000/login",
+            data:{
+              email: username,
+              password: password
+             }
+          })
+          .then((response) => {
+            sessionStorage.setItem('token', response.data.token)
+            axios.get('http://127.0.0.1:5000/user', {
+        headers: {
+            'x-access-token': sessionStorage.getItem('token')
+        }
+        }).then((response) => {
+            console.log(response)
+        }).catch((error) => {
+        if (error.response) {
+          console.log(error.response)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+          }
+      })
+          }).catch((error) => {
+            if (error.response) {
+              console.log(error.response)
+              console.log(error.response.status)
+              console.log(error.response.headers)
+              }
+          })
+          
     }
-
+    
     return (
         <Layout>
             <div className="card">
