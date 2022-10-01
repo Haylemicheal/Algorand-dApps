@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import Register from './components/login'
+import Login from '../components/login'
 
 export default function Home() {
   return (
@@ -22,7 +22,7 @@ export default function Home() {
 
         <div className="grid">
           <div className="card">
-            <Register/>
+            <Login/>
           </div>
         </div>
       </main>
