@@ -75,7 +75,10 @@ def login():
 			'exp' : datetime.utcnow() + timedelta(minutes = 30)
 		}, app.config['SECRET_KEY'])
 
-		return make_response(jsonify({'token' : token.decode('UTF-8')}), 201)
+		return make_response(
+			jsonify({'token' : token.decode('UTF-8'),
+			'role' : user.role
+			}), 201)
 	return make_response(
 		'Could not verify',
 		403,

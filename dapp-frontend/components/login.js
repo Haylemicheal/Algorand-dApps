@@ -11,7 +11,6 @@ export default Login;
 function Login() {
     const router = useRouter();
 
-    // form validation rules 
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Username is required'),
         password: Yup.string().required('Password is required')
@@ -22,13 +21,6 @@ function Login() {
     const { errors } = formState;
 
     function onSubmit({ username, password }) {
-        // return userService.login(username, password)
-        // .then(() => {
-        //     // const returnUrl = router.query.returnUrl || '/';
-        //     // router.push(returnUrl);
-        //     console.log("Sucessful")
-        // })
-        // .catch(alertService.error);
         axios({
             method: "POST",
             url:"http://127.0.0.1:5000/login",
@@ -39,27 +31,19 @@ function Login() {
           })
           .then((response) => {
             sessionStorage.setItem('token', response.data.token)
-            axios.get('http://127.0.0.1:5000/user', {
-        headers: {
-            'x-access-token': sessionStorage.getItem('token')
-        }
-        }).then((response) => {
-            console.log(response)
-        }).catch((error) => {
-        if (error.response) {
-          console.log(error.response)
-          console.log(error.response.status)
-          console.log(error.response.headers)
-          }
-      })
+            if (response.data.role == 'admin') {
+                router.push('/admin')
+            } else {
+                router.push('/trainee')
+            }
+            
           }).catch((error) => {
             if (error.response) {
               console.log(error.response)
               console.log(error.response.status)
               console.log(error.response.headers)
               }
-          })
-          
+          })  
     }
     
     return (
@@ -89,3 +73,16 @@ function Login() {
         </Layout>
     );
 }
+// axios.get('http://127.0.0.1:5000/user', {
+//         headers: {
+//             'x-access-token': sessionStorage.getItem('token')
+//         }
+//         }).then((response) => {
+//             console.log(response)
+//         }).catch((error) => {
+//         if (error.response) {
+//           console.log(error.response)
+//           console.log(error.response.status)
+//           console.log(error.response.headers)
+//           }
+//         })
