@@ -3,23 +3,23 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Layout } from './account/Layout';
+import { AlgoService } from '../services'
 
 export default AdminForm;
 
 function AdminForm() { 
     const router = useRouter();
     const validationSchema = Yup.object().shape({
+        accounts: Yup.string()
+        .required('Account is required'),
         assetName: Yup.string()
             .required('Asset Name is required'),
         unitName: Yup.string()
             .required('UnitName is required'),
         totalUnit: Yup.string()
             .required('TotalUnit is required'),
-        decimals: Yup.string()
-            .required('Decimals is required'),
         note: Yup.string()
-        .required('note is required'),
-
+        .required('note is required')
     });
     const formOptions = { resolver: yupResolver(validationSchema) };
 
@@ -27,13 +27,17 @@ function AdminForm() {
     const { register, handleSubmit, formState } = useForm(formOptions);
     const { errors } = formState;
 
-    function onSubmit(user) {
-        // return userService.register(user)
-        //     .then(() => {
-        //         alertService.success('Registration successful', { keepAfterRouteChange: true });
-        //         router.push('login');
-        //     })
-        //     .catch(alertService.error);
+    function onSubmit(data) {
+        console.log(data)
+        let service = AlgoService
+        data = {
+            'from': data.accounts,
+            'assetName': data.assetName,
+            'unitName': data.unitName,
+            'total': BigInt(data.totalUnit),
+            'note': AlgoSigner.encoding.stringToByteArray(data.note),
+          }
+        service.signAsset(data)
     }
 
     return (
@@ -44,8 +48,9 @@ function AdminForm() {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="form-group">
                             <label>Account</label>
-                            <select id ="accounts" className="form-control">
+                            <select id ="accounts" name="accounts" {...register('accounts')} className={`form-control ${errors.accounts ? 'is-invalid' : ''}`}>
                             </select>
+                            <div className="invalid-feedback">{errors.accounts?.message}</div>
                         </div>
                         <div className="form-group">
                             <label>Asset Name</label>
@@ -59,13 +64,8 @@ function AdminForm() {
                         </div>
                         <div className="form-group">
                             <label>Total Unit</label>
-                            <input name="totalUnit" type="text" {...register('toltalUnit')} className={`form-control ${errors.totalUnit ? 'is-invalid' : ''}`} />
+                            <input name="totalUnit" type="number" {...register('totalUnit')} className={`form-control ${errors.totalUnit ? 'is-invalid' : ''}`} />
                             <div className="invalid-feedback">{errors.totalUnit?.message}</div>
-                        </div>
-                        <div className="form-group">
-                            <label>Decimals</label>
-                            <input name="decimals" type="text" {...register('decimals')} className={`form-control ${errors.decimals ? 'is-invalid' : ''}`} />
-                            <div className="invalid-feedback">{errors.decimals?.message}</div>
                         </div>
                         <div className="form-group">
                             <label>Note</label>
